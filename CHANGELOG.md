@@ -1,5 +1,11 @@
 # @mild-ts/npm-typescript-boilerplate
 
+## 0.1.0
+
+### Minor Changes
+
+- ae0945a: Init Release
+
 ## 0.0.2
 
 ### Patch Changes
