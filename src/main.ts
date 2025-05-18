@@ -1,6 +1,6 @@
 import { cli } from 'cleye';
 import { glob } from 'glob';
-import { readFile, stat } from 'fs/promises';
+import { readFile, stat, writeFile } from 'fs/promises';
 import path from 'path';
 import clipboard from 'clipboardy';
 import c from 'ansis';
@@ -15,6 +15,10 @@ const argv = cli({
       type: String,
       description: 'Filter by file extension (e.g. .ts)',
       default: '',
+    },
+    output: {
+      type: String,
+      description: 'Write output to a file (Markdown format)',
     },
     ignore: {
       type: [String],
@@ -87,6 +91,12 @@ async function main() {
   console.log(c.bold(`\n${MARK_INFO} Files collected:`));
   for (const file of files) {
     console.log(`   ${MARK_BULLET} ${file.path}`);
+  }
+
+  if (argv.flags.output) {
+    const outputPath = path.resolve(argv.flags.output);
+    await writeFile(outputPath, output, 'utf-8');
+    console.log(`📝 Written output to ${outputPath}`);
   }
 
   await clipboard.write(output);
