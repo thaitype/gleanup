@@ -1,5 +1,11 @@
 # @mild-ts/npm-typescript-boilerplate
 
+## 1.0.0
+
+### Major Changes
+
+- fac042b: Release init major version
+
 ## 0.1.0
 
 ### Minor Changes
