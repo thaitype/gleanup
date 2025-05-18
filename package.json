@@ -1,6 +1,6 @@
 {
   "name": "readup",
-  "version": "0.0.2",
+  "version": "0.0.0",
   "description": "Read your project files recursively and print them in a clean format for LLMs, reviews, or sharing.",
   "main": "./dist/main.js",
   "module": "./dist/main.mjs",
