@@ -1,5 +1,11 @@
 # @mild-ts/npm-typescript-boilerplate
 
+## 1.1.0
+
+### Minor Changes
+
+- d6e70d7: Support custom pattern
+
 ## 1.0.0
 
 ### Major Changes
