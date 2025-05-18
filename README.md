@@ -41,6 +41,12 @@ npx gleanup
 npx gleanup ./src --output context.md
 ```
 
+### Use a custom glob pattern
+
+```bash
+npx gleanup . --pattern 'src/**/*.ts'
+```
+
 ### Filter by extension and print to console
 
 ```bash
@@ -52,16 +58,16 @@ npx gleanup . --ext .ts --print
 ```bash
 npx gleanup . --ignore dist --ignore '**/*.test.ts'
 ```
-
 ## ⚙️ Options
 
-| Flag          | Description                                      | Example                   |
-| ------------- | ------------------------------------------------ | ------------------------- |
-| `[directory]` | Base folder to scan (default: current directory) | `npx gleanup ./my-folder` |
-| `--ext`       | Filter by file extension                         | `--ext .ts`               |
-| `--ignore`    | Glob patterns to exclude (can use multiple)      | `--ignore dist/**`        |
-| `--print`     | Also print output to terminal                    | `--print`                 |
-| `--output`    | Write output to file (Markdown format)           | `--output context.md`     |
+| Flag          | Description                                              | Example                   |
+| ------------- | -------------------------------------------------------- | ------------------------- |
+| `[directory]` | Base folder to scan (default: current working directory) | `npx gleanup ./project`   |
+| `--pattern`   | Custom glob pattern for matching files (default: `"**"`) | `--pattern 'src/**/*.ts'` |
+| `--ext`       | Filter files by extension                                | `--ext .ts`               |
+| `--ignore`    | Glob patterns to exclude (can be used multiple times)    | `--ignore dist/**`        |
+| `--output`    | Write Markdown output to a file                          | `--output context.md`     |
+| `--print`     | Also print the Markdown output to terminal               | `--print`                 |
 
 ## 💡 Use Cases
 
