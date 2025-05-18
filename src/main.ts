@@ -3,6 +3,8 @@ import { glob } from 'glob';
 import { readFile, stat } from 'fs/promises';
 import path from 'path';
 import clipboard from 'clipboardy';
+import c from 'ansis';
+import { MARK_BULLET, MARK_CHECK, MARK_INFO } from './constant';
 
 const argv = cli({
   name: 'gleanup',
@@ -26,6 +28,8 @@ const argv = cli({
   },
 });
 
+const DEFUALT_IGNORE = ['node_modules/**', '.git/**', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lock'];
+
 const cwd = path.resolve(argv._.directory || process.cwd());
 const extFilter = argv.flags.ext;
 const ignorePatterns = argv.flags.ignore;
@@ -33,7 +37,7 @@ const ignorePatterns = argv.flags.ignore;
 async function listFilesWithContent() {
   const files = await glob('**', {
     cwd,
-    ignore: ['node_modules/**', '.git/**', 'pnpm-lock.yaml', ...ignorePatterns],
+    ignore: [...DEFUALT_IGNORE, ...ignorePatterns],
   });
 
   const results = await Promise.all(
@@ -54,6 +58,20 @@ async function listFilesWithContent() {
 }
 
 async function main() {
+  console.log(c.bold(c.blue(`\n${MARK_INFO} Gleanup - File dumper`)));
+
+  console.log(`\n${MARK_INFO} Searching for files in:\n   ${cwd}\n`);
+  if (extFilter) {
+    console.log(`${MARK_BULLET} Extension: "${extFilter}"`);
+  } else {
+    console.log(`${MARK_BULLET} Extension: "all"`);
+  }
+  console.log(`${MARK_BULLET} Pattern: "**"`);
+  console.log(`${MARK_BULLET} Ignoring:`);
+  const allIgnore = [...DEFUALT_IGNORE, ...ignorePatterns];
+  for (const ig of allIgnore) {
+    console.log(`   ${MARK_BULLET} ${ig}`);
+  }
   const files = await listFilesWithContent();
 
   let output = `## 🧾 File dump from \`${cwd}\`\n\n`;
@@ -65,8 +83,9 @@ async function main() {
     })
     .join('\n');
 
+  console.log(c.bold(`\n${MARK_INFO} Files collected:`));
   for (const file of files) {
-    console.log(`File: ${file.path}`);
+    console.log(`   ${MARK_BULLET} ${file.path}`);
   }
 
   await clipboard.write(output);
@@ -75,7 +94,7 @@ async function main() {
     console.log(output);
   }
 
-  console.log(`📋 Copied ${files.length} file(s) from ${cwd} to clipboard (Markdown format).`);
+  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard (Markdown format).`));
 }
 main().catch(err => {
   console.error('❌ Error:', err);
