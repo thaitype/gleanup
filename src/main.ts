@@ -1,17 +1,22 @@
 import { cli } from 'cleye';
-import tinyGlob from 'tiny-glob';
+import { glob } from 'glob';
 import { readFile, stat } from 'fs/promises';
 import path from 'path';
 import clipboard from 'clipboardy';
 
 const argv = cli({
-  name: 'readup',
-  parameters: ['<directory>'],
+  name: 'gleanup',
+  parameters: ['[directory]'],
   flags: {
     ext: {
       type: String,
       description: 'Filter by file extension (e.g. .ts)',
       default: '',
+    },
+    ignore: {
+      type: [String],
+      description: 'Glob patterns to ignore (e.g. node_modules/**)',
+      default: [],
     },
     print: {
       type: Boolean,
@@ -21,11 +26,15 @@ const argv = cli({
   },
 });
 
-const cwd = path.resolve(argv._.directory);
+const cwd = path.resolve(argv._.directory || process.cwd());
 const extFilter = argv.flags.ext;
+const ignorePatterns = argv.flags.ignore;
 
 async function listFilesWithContent() {
-  const files = await tinyGlob('**', { cwd });
+  const files = await glob('**', {
+    cwd,
+    ignore: ['node_modules/**', '.git/**', 'pnpm-lock.yaml', ...ignorePatterns],
+  });
 
   const results = await Promise.all(
     files.map(async file => {
@@ -46,10 +55,19 @@ async function listFilesWithContent() {
 
 async function main() {
   const files = await listFilesWithContent();
-  let output = `Working Directory: ${cwd}\n\n`;
+
+  let output = `## 🧾 File dump from \`${cwd}\`\n\n`;
+
   output += files
-    .map(f => `--------\n// Path: ${f.path}\n\n${f.content}`)
-    .join('\n\n');
+    .map(f => {
+      const ext = path.extname(f.path).slice(1) || ''; // เอานามสกุลไปใช้กับ code block
+      return `### \`${f.path}\`\n\n\`\`\`${ext}\n${f.content}\n\`\`\`\n`;
+    })
+    .join('\n');
+
+  for (const file of files) {
+    console.log(`File: ${file.path}`);
+  }
 
   await clipboard.write(output);
 
@@ -57,9 +75,8 @@ async function main() {
     console.log(output);
   }
 
-  console.log(`📋 Copied ${files.length} file(s) from ${cwd} to clipboard.`);
+  console.log(`📋 Copied ${files.length} file(s) from ${cwd} to clipboard (Markdown format).`);
 }
-
 main().catch(err => {
   console.error('❌ Error:', err);
   process.exit(1);
