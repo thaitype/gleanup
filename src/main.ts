@@ -30,6 +30,11 @@ const argv = cli({
       description: 'Also print to stdout',
       default: false,
     },
+    pattern: {
+      type: String,
+      description: 'Glob pattern to match files (default: "**")',
+      default: '**',
+    },
   },
 });
 
@@ -40,7 +45,7 @@ const extFilter = argv.flags.ext;
 const ignorePatterns = argv.flags.ignore;
 
 async function listFilesWithContent() {
-  const files = await glob('**', {
+  const files = await glob(argv.flags.pattern, {
     cwd,
     ignore: [...DEFUALT_IGNORE, ...ignorePatterns],
   });
@@ -71,7 +76,7 @@ async function main() {
   } else {
     console.log(`${MARK_BULLET} Extension: "all"`);
   }
-  console.log(`${MARK_BULLET} Pattern: "**"`);
+  console.log(`${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
   console.log(`${MARK_BULLET} Ignoring:`);
   const allIgnore = [...DEFUALT_IGNORE, ...ignorePatterns];
   for (const ig of allIgnore) {
@@ -105,9 +110,13 @@ async function main() {
     console.log(output);
   }
 
+  if(files.length === 0) {
+    throw new Error('No files found matching the criteria.');
+  }
+
   console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard`));
 }
 main().catch(err => {
-  console.error('❌ Error:', err);
+  console.error('\n❌ Error:\n', err);
   process.exit(1);
 });
