@@ -13,9 +13,15 @@
       "default": "./dist/main.js"
     }
   },
+  "bin": {
+    "gleanup": "bin.mjs"
+  },
   "files": [
-    "dist/**",
-    "src/**"
+    "bin.mjs",
+    "dist",
+    "src",
+    "package.json",
+    "README.md"
   ],
   "scripts": {
     "all": "run-s lint build",
