@@ -1,6 +1,7 @@
 {
   "name": "gleanup",
   "version": "0.0.0",
+  "type": "module",
   "description": "Read your project files recursively and print them in a clean format for LLMs, reviews, or sharing.",
   "main": "./dist/main.js",
   "module": "./dist/main.mjs",

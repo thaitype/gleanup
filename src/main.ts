@@ -5,6 +5,7 @@ import path from 'path';
 import clipboard from 'clipboardy';
 import c from 'ansis';
 import { MARK_BULLET, MARK_CHECK, MARK_INFO } from './constant';
+import { version } from './version';
 
 const argv = cli({
   name: 'gleanup',
@@ -58,7 +59,7 @@ async function listFilesWithContent() {
 }
 
 async function main() {
-  console.log(c.bold(c.blue(`\n${MARK_INFO} Gleanup - File dumper`)));
+  console.log(c.bold(c.blue(`\n${MARK_INFO} Gleanup - File dumper v${version}`)));
 
   console.log(`\n${MARK_INFO} Searching for files in:\n   ${cwd}\n`);
   if (extFilter) {
@@ -94,7 +95,7 @@ async function main() {
     console.log(output);
   }
 
-  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard (Markdown format).`));
+  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard`));
 }
 main().catch(err => {
   console.error('❌ Error:', err);
