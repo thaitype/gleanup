@@ -1,9 +1,5 @@
 name: Publish
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
   push:
     branches:
       - "main"
@@ -29,6 +25,7 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run all
       
       - name: Create Release Pull Request or Publish
         id: changesets
