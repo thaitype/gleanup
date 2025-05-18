@@ -1,5 +1,5 @@
 {
-  "name": "readup",
+  "name": "gleanup",
   "version": "0.0.0",
   "description": "Read your project files recursively and print them in a clean format for LLMs, reviews, or sharing.",
   "main": "./dist/main.js",
@@ -41,12 +41,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mild-ts/npm-typescript-boilerplate.git"
+    "url": "https://github.com/thaitype/gleanup.git"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "homepage": "https://github.com/thaitype/gleanup#readme",
   "ava": {
     "extensions": [
       "ts"
