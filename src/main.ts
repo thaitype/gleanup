@@ -1,11 +1,15 @@
 import { cli } from 'cleye';
-import { glob } from 'glob';
+import { globby } from 'globby';
 import { readFile, stat, writeFile } from 'fs/promises';
 import path from 'path';
 import clipboard from 'clipboardy';
 import c from 'ansis';
-import { MARK_BULLET, MARK_CHECK, MARK_INFO } from './constant';
+import { MARK_BULLET, MARK_CHECK, MARK_ERROR, MARK_INFO } from './constant';
 import { version } from './version';
+import { existsSync } from 'fs';
+import { isText } from 'istextorbinary';
+import prettyBytes from 'pretty-bytes';
+import { error } from 'console';
 
 const argv = cli({
   name: 'gleanup',
@@ -38,16 +42,22 @@ const argv = cli({
   },
 });
 
-const DEFUALT_IGNORE = ['node_modules/**', '.git/**', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lock'];
+function logger(...args: any[]) {
+  if (argv.flags.print) return;
+  console.log(...args);
+}
+
+const DEFUALT_IGNORE = ['.git/**', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lock'];
 
 const cwd = path.resolve(argv._.directory || process.cwd());
 const extFilter = argv.flags.ext;
 const ignorePatterns = argv.flags.ignore;
 
 async function listFilesWithContent() {
-  const files = await glob(argv.flags.pattern, {
+  const files = await globby(argv.flags.pattern, {
     cwd,
     ignore: [...DEFUALT_IGNORE, ...ignorePatterns],
+    gitignore: true,
   });
 
   const results = await Promise.all(
@@ -55,6 +65,11 @@ async function listFilesWithContent() {
       const fullPath = path.join(cwd, file);
       const fileStat = await stat(fullPath);
       if (!fileStat.isFile()) return null;
+
+      // ⛔ Skip non-text files
+      const isTextFile = isText(fullPath);
+      if (!isTextFile) return null;
+
       if (extFilter && !file.endsWith(extFilter)) return null;
 
       return {
@@ -67,21 +82,42 @@ async function listFilesWithContent() {
   return results.filter(Boolean) as { path: string; content: string }[];
 }
 
-async function main() {
-  console.log(c.bold(c.blue(`\n${MARK_INFO} Gleanup - File dumper v${version}`)));
+function checkGitIgnore() {
+  const gitignorePath = path.join(cwd, '.gitignore');
+  const hasGitignore = existsSync(gitignorePath);
 
-  console.log(`\n${MARK_INFO} Searching for files in:\n   ${cwd}\n`);
-  if (extFilter) {
-    console.log(`${MARK_BULLET} Extension: "${extFilter}"`);
+  if (hasGitignore) {
+    logger(`   ${MARK_BULLET} ${c.bold('.gitignore')} found – applying its rules`);
   } else {
-    console.log(`${MARK_BULLET} Extension: "all"`);
+    logger(`   ${MARK_BULLET} ${c.bold('.gitignore')} not found – no rules applied`);
   }
-  console.log(`${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
-  console.log(`${MARK_BULLET} Ignoring:`);
-  const allIgnore = [...DEFUALT_IGNORE, ...ignorePatterns];
-  for (const ig of allIgnore) {
-    console.log(`   ${MARK_BULLET} ${ig}`);
+}
+
+function logInfomation() {
+  logger(c.bold(c.blue(`\n${c.bgBlue('Gleanup')} v${version} - Dump files as Markdown to clipboard\n`)));
+
+  logger(`\n${MARK_INFO} Target directory::\n   ${cwd}\n`);
+  logger(`${MARK_INFO} Scan settings:`);
+  if (extFilter) {
+    logger(`   ${MARK_BULLET} Extension: .${extFilter}`);
+  } else {
+    logger(`   ${MARK_BULLET} Extension: (no filter)`);
   }
+  logger(`   ${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
+  logger(`   ${MARK_BULLET} Ignored: ${ignorePatterns.length === 0 ? '(none)' : ignorePatterns.map(p => `"${p}"`).join(', ')}`);
+  checkGitIgnore();
+}
+
+function outputStats(content: string) {
+  const byteSize = Buffer.byteLength(content, 'utf-8');
+  const readableSize = prettyBytes(byteSize);
+
+  logger(c.bold(`\n${MARK_INFO} Summary Output size: ${readableSize}`));
+}
+
+async function main() {
+  logInfomation();
+
   const files = await listFilesWithContent();
 
   let output = `## 🧾 File dump from \`${cwd}\`\n\n`;
@@ -93,15 +129,15 @@ async function main() {
     })
     .join('\n');
 
-  console.log(c.bold(`\n${MARK_INFO} Files collected:`));
+  logger(c.bold(`\n${MARK_INFO} Files collected:`));
   for (const file of files) {
-    console.log(`   ${MARK_BULLET} ${file.path}`);
+    logger(`   ${MARK_BULLET} ${file.path}`);
   }
 
   if (argv.flags.output) {
     const outputPath = path.resolve(argv.flags.output);
     await writeFile(outputPath, output, 'utf-8');
-    console.log(`📝 Written output to ${outputPath}`);
+    logger(`📝 Written output to ${outputPath}`);
   }
 
   await clipboard.write(output);
@@ -110,13 +146,23 @@ async function main() {
     console.log(output);
   }
 
-  if(files.length === 0) {
+  if (files.length === 0) {
     throw new Error('No files found matching the criteria.');
   }
 
-  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard`));
+  outputStats(output);
+  logger(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) to clipboard from:\n  ${cwd}\n`));
+  logger(c.bold(`${MARK_CHECK} Done!\n`));
 }
 main().catch(err => {
-  console.error('\n❌ Error:\n', err);
+  if (err instanceof Error) {
+    if (err.message.includes('No files found matching the criteria.')) {
+      console.error(c.red(`\n${MARK_ERROR} Error: ${err.message}\n`));
+    } else {
+      console.error(c.red(`\n${MARK_ERROR} Something wrong: `), err);
+    }
+  } else {
+    console.error(c.red(`\n${MARK_ERROR} Something wrong: ${err}\n`));
+  }
   process.exit(1);
 });
