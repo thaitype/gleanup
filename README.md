@@ -1,5 +1,7 @@
 # gleanup
 
+[![CI](https://github.com/thaitype/gleanup/actions/workflows/main.yml/badge.svg)](https://github.com/thaitype/gleanup/actions/workflows/main.yml) [![NPM Version](https://img.shields.io/npm/v/gleanup) ](https://www.npmjs.com/package/gleanup)[![npm downloads](https://img.shields.io/npm/dt/gleanup)](https://www.npmjs.com/package/gleanup)
+
 > CLI tool to collect source files into a Markdown-formatted bundle – perfect for LLMs, code review, or context sharing.
 
 **gleanup** reads files recursively from a directory, and outputs their content as neatly formatted Markdown – ready to paste into a chat or documentation. It can also copy the result to your clipboard or write to a file.
@@ -8,10 +10,12 @@
 
 - 📦 Recursively read files in a directory
 - 📝 Output Markdown with syntax-highlighted code blocks
-- 📋 Copy to clipboard for instant use in ChatGPT or Notion
-- 🔥 Ignore common folders (`node_modules`, `.git`, `dist`, etc.)
-- 🧾 Optional file output (`--output context.md`)
-- 🎯 Filter by file extension (`--ext .ts`)
+- 📋 Copy to clipboard for instant use in ChatGPT, Claude, or Notion
+- 🧠 Automatically ignores files listed in `.gitignore`
+- 🔥 Skips binary files (e.g. images, PDFs, archives)
+- 🧾 Optional file output via `--output`
+- 🎯 Filter by file extension via `--ext`
+- 💬 Clean, minimal logs (auto-suppressed when `--print` is used)
 
 ## 🧪 Installation & Usage
 
@@ -35,12 +39,6 @@ npm install -g gleanup
 npx gleanup
 ```
 
-### Read a specific folder and write to file
-
-```bash
-npx gleanup ./src --output context.md
-```
-
 ### Use a custom glob pattern
 
 ```bash
@@ -58,6 +56,13 @@ npx gleanup . --ext .ts --print
 ```bash
 npx gleanup . --ignore dist --ignore '**/*.test.ts'
 ```
+
+### Read a specific folder and write to file
+
+```bash
+npx gleanup ./src --output context.md
+```
+
 ## ⚙️ Options
 
 | Flag          | Description                                              | Example                   |
@@ -67,7 +72,7 @@ npx gleanup . --ignore dist --ignore '**/*.test.ts'
 | `--ext`       | Filter files by extension                                | `--ext .ts`               |
 | `--ignore`    | Glob patterns to exclude (can be used multiple times)    | `--ignore dist/**`        |
 | `--output`    | Write Markdown output to a file                          | `--output context.md`     |
-| `--print`     | Also print the Markdown output to terminal               | `--print`                 |
+| `--print`     | Also print the Markdown output to terminal (no logs)     | `--print`                 |
 
 ## 💡 Use Cases
 
@@ -76,11 +81,6 @@ npx gleanup . --ignore dist --ignore '**/*.test.ts'
 * Attach full code context to GitHub PR or Jira
 * Copy source as Markdown for docs or blog posts
 
-## 🛠️ Future Ideas
-
-* Support `.gitignore` automatically
-* Highlight diffs or line numbers
-* Format output as JSON or plain text
 
 ## 🧙‍♂️ Author
 
