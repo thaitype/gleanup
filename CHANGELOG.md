@@ -1,5 +1,11 @@
 # @mild-ts/npm-typescript-boilerplate
 
+## 1.2.0
+
+### Minor Changes
+
+- 3e991e6: Support .gitignore
+
 ## 1.1.0
 
 ### Minor Changes
