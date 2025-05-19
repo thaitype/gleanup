@@ -40,6 +40,11 @@ const argv = cli({
   },
 });
 
+function logger(...args: any[]) {
+  if (argv.flags.print) return;
+  console.log(...args);
+}
+
 const DEFUALT_IGNORE = ['.git/**', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lock'];
 
 const cwd = path.resolve(argv._.directory || process.cwd());
@@ -75,24 +80,24 @@ function checkGitIgnore() {
   const hasGitignore = existsSync(gitignorePath);
 
   if (hasGitignore) {
-    console.log(`   ${MARK_BULLET} ${c.bold('.gitignore')} found – applying its rules`);
+    logger(`   ${MARK_BULLET} ${c.bold('.gitignore')} found – applying its rules`);
   } else {
-    console.log(`   ${MARK_BULLET} ${c.bold('.gitignore')} not found – no rules applied`);
+    logger(`   ${MARK_BULLET} ${c.bold('.gitignore')} not found – no rules applied`);
   }
 }
 
 function logInfomation() {
-  console.log(c.bold(c.blue(`\n${MARK_INFO} ${c.bgBlue('Gleanup')} v${version} - Dump files as Markdown to clipboard\n`)));
+  logger(c.bold(c.blue(`\n${MARK_INFO} ${c.bgBlue('Gleanup')} v${version} - Dump files as Markdown to clipboard\n`)));
 
-  console.log(`\n${MARK_INFO} Target directory::\n   ${cwd}\n`);
-  console.log(`${MARK_INFO} Scan settings:`);
+  logger(`\n${MARK_INFO} Target directory::\n   ${cwd}\n`);
+  logger(`${MARK_INFO} Scan settings:`);
   if (extFilter) {
-    console.log(`   ${MARK_BULLET} Extension: .${extFilter}`);
+    logger(`   ${MARK_BULLET} Extension: .${extFilter}`);
   } else {
-    console.log(`   ${MARK_BULLET} Extension: (no filter)`);
+    logger(`   ${MARK_BULLET} Extension: (no filter)`);
   }
-  console.log(`   ${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
-  console.log(`   ${MARK_BULLET} Ignored: ${ignorePatterns.length === 0 ? '(none)' : ignorePatterns.map(p => `"${p}"`).join(', ')}`);
+  logger(`   ${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
+  logger(`   ${MARK_BULLET} Ignored: ${ignorePatterns.length === 0 ? '(none)' : ignorePatterns.map(p => `"${p}"`).join(', ')}`);
   checkGitIgnore();
 }
 
@@ -110,15 +115,15 @@ async function main() {
     })
     .join('\n');
 
-  console.log(c.bold(`\n${MARK_INFO} Files collected:`));
+  logger(c.bold(`\n${MARK_INFO} Files collected:`));
   for (const file of files) {
-    console.log(`   ${MARK_BULLET} ${file.path}`);
+    logger(`   ${MARK_BULLET} ${file.path}`);
   }
 
   if (argv.flags.output) {
     const outputPath = path.resolve(argv.flags.output);
     await writeFile(outputPath, output, 'utf-8');
-    console.log(`📝 Written output to ${outputPath}`);
+    logger(`📝 Written output to ${outputPath}`);
   }
 
   await clipboard.write(output);
@@ -131,7 +136,7 @@ async function main() {
     throw new Error('No files found matching the criteria.');
   }
 
-  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) to clipboard from:\n  ${cwd}\n`));
+  logger(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) to clipboard from:\n  ${cwd}\n`));
 }
 main().catch(err => {
   console.error('\n❌ Error:\n', err);
