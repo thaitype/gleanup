@@ -1,5 +1,0 @@
----
-'gleanup': minor
----
-
-Support .gitignore
