@@ -23,6 +23,9 @@ importers:
       istextorbinary:
         specifier: ^9.5.0
         version: 9.5.0
+      pretty-bytes:
+        specifier: ^7.0.0
+        version: 7.0.0
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.4
@@ -1617,6 +1620,10 @@ packages:
     resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
     engines: {node: '>=14'}
     hasBin: true
+
+  pretty-bytes@7.0.0:
+    resolution: {integrity: sha512-U5otLYPR3L0SVjHGrkEUx5mf7MxV2ceXeE7VwWPk+hyzC5drNohsOGNPDZqxCqyX1lkbEN4kl1LiI8QFd7r0ZA==}
+    engines: {node: '>=20'}
 
   pretty-ms@9.2.0:
     resolution: {integrity: sha512-4yf0QO/sllf/1zbZWYnvWw3NxCQwLXKzIj0G849LSufP15BXKM0rbD2Z3wVnkMfjdn/CB0Dpp444gYAACdsplg==}
@@ -3668,6 +3675,8 @@ snapshots:
   prettier@2.8.8: {}
 
   prettier@3.5.3: {}
+
+  pretty-bytes@7.0.0: {}
 
   pretty-ms@9.2.0:
     dependencies:
