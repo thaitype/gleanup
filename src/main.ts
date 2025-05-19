@@ -75,21 +75,24 @@ function checkGitIgnore() {
   const hasGitignore = existsSync(gitignorePath);
 
   if (hasGitignore) {
-    console.log(`${MARK_BULLET} ${c.bold('.gitignore')} found – applying its rules`);
+    console.log(`   ${MARK_BULLET} ${c.bold('.gitignore')} found – applying its rules`);
+  } else {
+    console.log(`   ${MARK_BULLET} ${c.bold('.gitignore')} not found – no rules applied`);
   }
 }
 
 function logInfomation() {
-  console.log(c.bold(c.blue(`\n${MARK_INFO} Gleanup - File dumper v${version}`)));
+  console.log(c.bold(c.blue(`\n${MARK_INFO} ${c.bgBlue('Gleanup')} v${version} - Dump files as Markdown to clipboard\n`)));
 
-  console.log(`\n${MARK_INFO} Searching for files in:\n   ${cwd}\n`);
+  console.log(`\n${MARK_INFO} Target directory::\n   ${cwd}\n`);
+  console.log(`${MARK_INFO} Scan settings:`);
   if (extFilter) {
-    console.log(`${MARK_BULLET} Extension: "${extFilter}"`);
+    console.log(`   ${MARK_BULLET} Extension: .${extFilter}`);
   } else {
-    console.log(`${MARK_BULLET} Extension: "all"`);
+    console.log(`   ${MARK_BULLET} Extension: (no filter)`);
   }
-  console.log(`${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
-  console.log(`${MARK_BULLET} Ignoring: "${ignorePatterns.join(', ')}"`);
+  console.log(`   ${MARK_BULLET} Pattern: "${argv.flags.pattern}"`);
+  console.log(`   ${MARK_BULLET} Ignored: ${ignorePatterns.length === 0 ? '(none)' : ignorePatterns.map(p => `"${p}"`).join(', ')}`);
   checkGitIgnore();
 }
 
@@ -128,7 +131,7 @@ async function main() {
     throw new Error('No files found matching the criteria.');
   }
 
-  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) from ${cwd} to clipboard`));
+  console.log(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) to clipboard from:\n  ${cwd}\n`));
 }
 main().catch(err => {
   console.error('\n❌ Error:\n', err);
