@@ -8,6 +8,7 @@ import c from 'ansis';
 import { MARK_BULLET, MARK_CHECK, MARK_INFO } from './constant';
 import { version } from './version';
 import { existsSync } from 'fs';
+import { isText } from 'istextorbinary';
 
 const argv = cli({
   name: 'gleanup',
@@ -63,6 +64,11 @@ async function listFilesWithContent() {
       const fullPath = path.join(cwd, file);
       const fileStat = await stat(fullPath);
       if (!fileStat.isFile()) return null;
+
+      // ⛔ Skip non-text files
+      const isTextFile = isText(fullPath);
+      if (!isTextFile) return null;
+
       if (extFilter && !file.endsWith(extFilter)) return null;
 
       return {
