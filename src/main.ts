@@ -9,7 +9,6 @@ import { version } from './version';
 import { existsSync } from 'fs';
 import { isText } from 'istextorbinary';
 import prettyBytes from 'pretty-bytes';
-import { error } from 'console';
 
 const argv = cli({
   name: 'gleanup',
@@ -120,7 +119,7 @@ async function main() {
 
   const files = await listFilesWithContent();
 
-  let output = `## 🧾 File dump from \`${cwd}\`\n\n`;
+  let output = `## File dump from \`${cwd}\`\n\n`;
 
   output += files
     .map(f => {
@@ -134,24 +133,24 @@ async function main() {
     logger(`   ${MARK_BULLET} ${file.path}`);
   }
 
-  if (argv.flags.output) {
-    const outputPath = path.resolve(argv.flags.output);
-    await writeFile(outputPath, output, 'utf-8');
-    logger(`📝 Written output to ${outputPath}`);
-  }
-
-  await clipboard.write(output);
-
-  if (argv.flags.print) {
-    console.log(output);
-  }
-
   if (files.length === 0) {
     throw new Error('No files found matching the criteria.');
   }
 
   outputStats(output);
-  logger(c.green(`\n${MARK_CHECK} Copied ${files.length} file(s) to clipboard from:\n  ${cwd}\n`));
+
+  if (argv.flags.output) {
+    const outputPath = path.resolve(argv.flags.output);
+    await writeFile(outputPath, output, 'utf-8');
+    logger(`\n${MARK_CHECK} Written output to ${outputPath}`);
+  } else if (argv.flags.print) {
+    console.log(output);
+  } else {
+    await clipboard.write(output);
+    logger(`\n${MARK_CHECK} Copied output to clipboard.`);
+  }
+
+  logger(c.green(`\n${MARK_CHECK} Proceed ${files.length} file(s) from:\n  ${cwd}\n`));
   logger(c.bold(`${MARK_CHECK} Done!\n`));
 }
 main().catch(err => {

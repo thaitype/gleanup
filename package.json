@@ -29,7 +29,7 @@
     "release": "npm run build && changeset publish",
     "lint": "tsc --noEmit",
     "test": "ava",
-    "local:run": " pnpm build && npx gleanup .",
+    "local:run": " pnpm build && npx gleanup . --output xxx.md",
     "upgrade-deps": "npx taze -r --interactive",
     "check-deps": "npx taze -r"
   },
