@@ -1,5 +1,11 @@
 # @mild-ts/npm-typescript-boilerplate
 
+## 1.2.2
+
+### Patch Changes
+
+- 92797a1: Print mode or output mode should not copy to clipboard
+
 ## 1.2.1
 
 ### Patch Changes
